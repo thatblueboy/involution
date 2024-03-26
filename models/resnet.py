@@ -33,7 +33,7 @@ class Bottleneck(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         
-  def forward(self, x):
+def forward(self, x):
       identity = x
       x = self.conv1(x)
       x = self.bn1(x)
@@ -47,6 +47,7 @@ class Bottleneck(nn.Module):
       x += identity
       x = self.relu(x)
       return x
+
 
 def get_expansion(block, expansion=None):
     """Get the expansion of a residual block.
@@ -145,12 +146,13 @@ class ResLayer(nn.Sequential):
 
 class ResNet(nn.Module):
   arch_settings = {
-        26: (Bottleneck, (1, 2, 4, 1)),
-        38: (Bottleneck(2, 3, 5, 2)),
-        50: (Bottleneck, (3, 4, 6, 3)),
-        101: (Bottleneck, (3, 4, 23, 3)),
-        152: (Bottleneck, (3, 8, 36, 3))
-    }
+    26: (Bottleneck, (1, 2, 4, 1)),
+    38: (Bottleneck, (2, 3, 5, 2)),
+    50: (Bottleneck, (3, 4, 6, 3)),
+    101: (Bottleneck, (3, 4, 23, 3)),
+    152: (Bottleneck, (3, 8, 36, 3))
+}
+
 
   def __init__(self, 
                depth,
