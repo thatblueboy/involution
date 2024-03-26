@@ -3,16 +3,8 @@ This repository contains re-Implementation of https://arxiv.org/abs/2103.06255
 
 ### Involution Kernal
 
-<div style="display: flex; justify-content: center;">
-  <div>
-    <img src="images/channel_agnostic.PNG" alt="Image 1" style="margin-right: 10px;"width="300" height="200" />
-    <p align="center">Channel Agnostic</p>
-  </div>
-  <div>
-    <img src="images/spatial_specific.gif" alt="Image 2" style="margin-left: 10px;"width="300" height="200" />
-    <p align="center">Spatial Specific</p>
-  </div>
-</div>
+<img src="https://github.com/thatblueboy/involution/assets/100462736/43bca57d-6cee-403d-91d8-68cc83a97a86" width="45%"></img> <img src="https://github.com/thatblueboy/involution/assets/100462736/cc45de86-83c1-4eb7-abb8-e48f4b8f0637" width="45%"></img> 
+
 
 The authors of _Involution: Inverting the Inherence of Convolution for Visual Recognition_ propose a novel involutional layers, which aims to enhance the representation power of convolutional neural networks by inverting the inherent properties of convolution operations. As such these kernals are channel agnostic and spatial specific.
 
