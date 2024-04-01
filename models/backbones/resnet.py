@@ -1,5 +1,5 @@
 import torch.nn as nn
-from utils.involution import Involution
+from backbones.utils.involution import Involution
 class Bottleneck(nn.Module):
   """Bottleneck block for ResNet.
 
@@ -147,7 +147,7 @@ class ResLayer(nn.Sequential):
 
         super(ResLayer, self).__init__(*layers)
 
-class ResNet(nn.Module):
+class ReDSNet(nn.Module):
   arch_settings = {
     26: (Bottleneck, (1, 2, 4, 1)),
     38: (Bottleneck, (2, 3, 5, 2)),
@@ -171,7 +171,7 @@ class ResNet(nn.Module):
               zero_init_residual=True,
               is_rednet = False,
               ):
-    super(ResNet, self).__init__()
+    super(ReDSNet, self).__init__()
     if depth not in self.arch_settings:
             raise KeyError(f'invalid depth {depth} for resnet')
     self.avg_down = avg_down
@@ -236,7 +236,7 @@ class ResNet(nn.Module):
               param.requires_grad = False
 
   def init_weights(self, pretrained=None):
-    super(ResNet, self).init_weights(pretrained)
+    super(ReDSNet, self).init_weights(pretrained)
 
     if pretrained is None:
         for m in self.modules():
