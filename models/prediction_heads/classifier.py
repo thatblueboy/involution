@@ -7,6 +7,9 @@ class Classifier(nn.Module):
         self.add_module("classifier", nn.Sequential(
                 nn.Linear(in_features=input_feats, out_features=mid_feats),
                 nn.Linear(in_features=mid_feats, out_features=output_feats),
-                nn.Softmax()
             )
         )
+    def forward(self, x):
+        print(x.shape)
+        logits = self.classifier(x)
+        return logits

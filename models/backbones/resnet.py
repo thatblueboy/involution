@@ -1,5 +1,5 @@
 import torch.nn as nn
-from backbones.utils.involution import Involution
+from models.backbones.utils.involution import Involution
 class Bottleneck(nn.Module):
   """Bottleneck block for ResNet.
 

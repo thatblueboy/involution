@@ -18,7 +18,7 @@ class GenericModel(pl.LightningModule):
     def get_test_metrics(self, outputs, labels):
         return NotImplementedError("Please Implement the Validation Metrics Function in Child Class")
     
-    def get_epoch_wise_metric_averages(self, metrics, epoch_metrics):
+    def get_epoch_wise_metric_averages(self, metrics, epoch_metrics, batch_idx):
         return NotImplementedError("Implement an Aggregating or Averaging methodology for testing metrics")
     
     def reset_epoch_metrics(self, epoch_metrics):
@@ -42,7 +42,7 @@ class GenericModel(pl.LightningModule):
         metrics = self.get_test_metrics(outputs, labels)
         for metric in metrics.keys():
             self.log(f"test/{metric}", metrics[metric])
-        self.test_epoch_metrics = self.get_epoch_wise_metric_averages(metrics, self.test_epoch_metrics)
+        self.test_epoch_metrics = self.get_epoch_wise_metric_averages(metrics, self.test_epoch_metrics, batch_idx)
         return metrics
     
     def validation_step(self, batch, batch_idx):
@@ -51,7 +51,7 @@ class GenericModel(pl.LightningModule):
         metrics = self.get_test_metrics(outputs, labels)
         for metric in metrics.keys():
             self.log(f"val/{metric}", metrics[metric])
-        self.val_epoch_metrics = self.get_epoch_wise_metric_averages(metrics, self.val_epoch_metrics)
+        self.val_epoch_metrics = self.get_epoch_wise_metric_averages(metrics, self.val_epoch_metrics, batch_idx)
         return metrics
 
     def on_train_epoch_end(self):
@@ -60,6 +60,6 @@ class GenericModel(pl.LightningModule):
 
     def on_test_epoch_end(self):
         for metric in self.epoch_metrics.keys():
-            self.log(f"test/{metric}", self.epoch_metrics[metric])
+            self.log(f"test/epoch_{metric}", self.epoch_metrics[metric])
         self.reset_epoch_metrics(self.epoch_metrics)
         
