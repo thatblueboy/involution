@@ -1,0 +1,6 @@
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+MNIST/
+cifar-100-python.tar.gz
+cifar-100-python

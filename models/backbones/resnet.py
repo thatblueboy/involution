@@ -1,5 +1,5 @@
 import torch.nn as nn
-
+from models.backbones.utils.involution import Involution
 class Bottleneck(nn.Module):
   """Bottleneck block for ResNet.
 
@@ -17,7 +17,7 @@ class Bottleneck(nn.Module):
             Default: dict(type='BN')
     """
 
-  def __init__(self, in_channels, out_channels, expansion = 4, downsample=None, stride=1):
+  def __init__(self, in_channels, out_channels, expansion = 4, downsample=None, stride=1, has_involution=False):
         super(Bottleneck, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -25,28 +25,30 @@ class Bottleneck(nn.Module):
         self.stride = stride
         self.expansion = expansion
         mid_channels = out_channels // self.expansion
-        self.conv1 = nn.Conv2d(in_channels, mid_channels, kernel_size=1, stride=stride, padding=1)
-        self.bn1 = nn.BatchNorm2d(out_channels)
-        self.conv2 = nn.Conv2d(mid_channels, mid_channels, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(in_channels, mid_channels, kernel_size=1, stride=stride)#, padding=1)
+        self.bn1 = nn.BatchNorm2d(mid_channels)
+        self.conv2 = Involution(mid_channels, kernel_size=3, stride=1) if has_involution else nn.Conv2d(mid_channels, mid_channels, kernel_size=3, stride=1, padding=1)
         self.bn2 = nn.BatchNorm2d(mid_channels)
-        self.conv3 = nn.Conv2d(mid_channels, out_channels, kernel_size=1, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(mid_channels, out_channels, kernel_size=1, stride=1)#, padding=1)
+        self.bn3 = nn.BatchNorm2d(out_channels)
+
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         
-def forward(self, x):
-      identity = x
-      x = self.conv1(x)
-      x = self.bn1(x)
-      x = self.relu(x)
-      x = self.conv2(x)
-      x = self.bn2(x)
-      x = self.conv3(x)
-      x = self.bn3(x)
-      if self.downsample is not None:
-          identity = self.downsample(identity)
-      x += identity
-      x = self.relu(x)
-      return x
+  def forward(self, x):
+        identity = x
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.conv2(x)
+        x = self.bn2(x)
+        x = self.conv3(x)
+        x = self.bn3(x)
+        if self.downsample is not None:
+            identity = self.downsample(identity)
+        x += identity
+        x = self.relu(x)
+        return x
 
 
 def get_expansion(block, expansion=None):
@@ -107,6 +109,7 @@ class ResLayer(nn.Sequential):
                  expansion=None,
                  stride=1,
                  avg_down = False,
+                 is_rednet = False,
                  **kwargs):
         self.block = block
         self.expansion = get_expansion(block, expansion)
@@ -130,7 +133,7 @@ class ResLayer(nn.Sequential):
 
         layers = []
         layers.append(
-            block( in_channels=in_channels, out_channels=out_channels,expansion=self.expansion, stride=stride, downsample=downsample,))
+            block( in_channels=in_channels, out_channels=out_channels,expansion=self.expansion, stride=stride, downsample=downsample, has_involution = is_rednet))
         in_channels = out_channels
         for _ in range(1, num_blocks):
             layers.append(
@@ -144,7 +147,7 @@ class ResLayer(nn.Sequential):
 
         super(ResLayer, self).__init__(*layers)
 
-class ResNet(nn.Module):
+class ReDSNet(nn.Module):
   arch_settings = {
     26: (Bottleneck, (1, 2, 4, 1)),
     38: (Bottleneck, (2, 3, 5, 2)),
@@ -155,7 +158,7 @@ class ResNet(nn.Module):
 
 
   def __init__(self, 
-               depth,
+                depth,
               in_channels=3,
               stem_channels=64,
               base_channels=64,
@@ -165,8 +168,10 @@ class ResNet(nn.Module):
               out_indices=(3, ),
               frozen_stages=-1,
               avg_down=False,
-              zero_init_residual=True):
-    super(ResNet, self).__init__()
+              zero_init_residual=True,
+              is_rednet = False,
+              ):
+    super(ReDSNet, self).__init__()
     if depth not in self.arch_settings:
             raise KeyError(f'invalid depth {depth} for resnet')
     self.avg_down = avg_down
@@ -202,6 +207,7 @@ class ResNet(nn.Module):
                 expansion=self.expansion,
                 stride=stride,
                 avg_down=self.avg_down,
+                is_rednet = is_rednet
                 )
             _in_channels = _out_channels
             _out_channels *= 2
@@ -230,7 +236,7 @@ class ResNet(nn.Module):
               param.requires_grad = False
 
   def init_weights(self, pretrained=None):
-    super(ResNet, self).init_weights(pretrained)
+    super(ReDSNet, self).init_weights(pretrained)
 
     if pretrained is None:
         for m in self.modules():
