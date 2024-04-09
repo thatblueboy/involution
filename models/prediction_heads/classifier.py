@@ -10,6 +10,5 @@ class Classifier(nn.Module):
             )
         )
     def forward(self, x):
-        print(x.shape)
         logits = self.classifier(x)
         return logits
