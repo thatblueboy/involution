@@ -34,9 +34,9 @@ class GenericClassificationDataset(Dataset):
 
         self.transforms = t.Compose([
             t.ToTensor(),
-            t.ToDtype(torch.uint8, scale=True),
+            t.ToDtype(torch.uint8),
             t.RandomHorizontalFlip(0.5),
-            t.ToDtype(torch.float32, scale=True),
+            t.ToDtype(torch.float32),
             t.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
 
@@ -53,7 +53,6 @@ class GenericClassificationDataset(Dataset):
         return len(self.dataset)
     
     def __getitem__(self, index):
-        print(np.asarray(self.dataset[index][0]).shape)
         return self.transforms(self.dataset[index])
         
 

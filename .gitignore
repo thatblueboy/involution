@@ -4,3 +4,5 @@
 MNIST/
 cifar-100-python.tar.gz
 cifar-100-python
+lightning_logs/
+tiny-imagenet-200/

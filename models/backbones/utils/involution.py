@@ -15,7 +15,7 @@ class ConvModule(nn.Module):
         x = self.bn(x)
         x = self.relu(x)
         return x
-
+    
 
 class Involution(nn.Module):
     def __init__(self, channels, kernel_size, stride):
