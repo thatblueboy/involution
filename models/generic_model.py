@@ -6,12 +6,12 @@ import torch
 from torch.optim import Adam
 
 class GenericModel(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, optimizer):
         super(GenericModel, self).__init__()
         self.epoch_loss = 0
         self.test_epoch_metrics = {}
         self.val_epoch_metrics = {}
-    
+        self.optimizer = optimizer
     def get_loss(self, outputs, labels):
         return NotImplementedError("Please Implement the Loss Function in Child Class")
     
@@ -25,7 +25,7 @@ class GenericModel(pl.LightningModule):
         return NotImplementedError("Implement a method to reset all the metrics per epoch that you used.")
     
     def configure_optimizers(self):
-        return Adam(self.parameters(), 1e-5)
+        return self.optimizer
     
     def training_step(self, batch, batch_idx):
         images, labels = batch
