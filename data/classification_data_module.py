@@ -14,7 +14,7 @@ class ClassificationDataModule(pl.LightningDataModule):
             self.train, self.val = random_split(self.dataset, (0.8,0.2))
     
     def train_dataloader(self):
-        return DataLoader(self.train, self.batch_size, shuffle=True, num_workers=self.num_workers, pin_memory=True)
+        return DataLoader(self.train, self.batch_size, shuffle=True, num_workers=self.num_workers, pin_memory=True,drop_last=True)
     
     def val_dataloader(self):
         return DataLoader(self.val, self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=True)

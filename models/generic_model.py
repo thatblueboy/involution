@@ -6,13 +6,15 @@ import torch
 from torch.optim import Adam
 
 class GenericModel(pl.LightningModule):
-    def __init__(self, optimizer, learning_rate):
+    def __init__(self, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs):
         super(GenericModel, self).__init__()
         self.epoch_loss = 0
         self.test_epoch_metrics = {}
         self.val_epoch_metrics = {}
         self.optimizer = optimizer
-        self.learning_rate = learning_rate
+        self.optimizer_kwargs = optimizer_kwargs
+        self.lr_scheduler = lr_scheduler
+        self.lr_scheduler_kwargs = lr_scheduler_kwargs
     def get_loss(self, outputs, labels):
         return NotImplementedError("Please Implement the Loss Function in Child Class")
     
@@ -26,7 +28,13 @@ class GenericModel(pl.LightningModule):
         return NotImplementedError("Implement a method to reset all the metrics per epoch that you used.")
     
     def configure_optimizers(self):
-        return self.optimizer(self.parameters(), lr=self.learning_rate)
+        optimizer = self.optimizer(self.parameters(), **self.optimizer_kwargs)
+        if not self.lr_scheduler is None:
+            lr_scheduler = self.lr_scheduler(optimizer, **self.lr_scheduler_kwargs)
+            return [optimizer],[lr_scheduler]
+            # return {'optimizer':optimizer, 'lr_shceduler': {'sceduler':lr_scheduler, 'interval':"step"}}
+        else:
+            return optimizer 
     
     def training_step(self, batch, batch_idx):
         images, labels = batch
@@ -60,6 +68,11 @@ class GenericModel(pl.LightningModule):
         self.epoch_loss = 0
 
     def on_test_epoch_end(self):
+        for metric in self.epoch_metrics.keys():
+            self.log(f"test/epoch_{metric}", self.epoch_metrics[metric])
+        self.reset_epoch_metrics(self.epoch_metrics)
+    
+    def on_validation_epoch_end(self) -> None:
         for metric in self.epoch_metrics.keys():
             self.log(f"test/epoch_{metric}", self.epoch_metrics[metric])
         self.reset_epoch_metrics(self.epoch_metrics)
