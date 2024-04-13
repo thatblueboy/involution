@@ -8,6 +8,7 @@ from torch.optim import Adam
 class GenericModel(pl.LightningModule):
     def __init__(self, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs):
         super(GenericModel, self).__init__()
+        self.save_hyperparameters()
         self.epoch_loss = 0
         self.test_epoch_metrics = {}
         self.val_epoch_metrics = {}
@@ -31,12 +32,20 @@ class GenericModel(pl.LightningModule):
         optimizer = self.optimizer(self.parameters(), **self.optimizer_kwargs)
         if not self.lr_scheduler is None:
             lr_scheduler = self.lr_scheduler(optimizer, **self.lr_scheduler_kwargs)
-            return [optimizer],[lr_scheduler]
+            return [{
+                "optimizer": optimizer,
+                "lr_scheduler": {
+                    "scheduler": lr_scheduler,
+                    "interval": "step",
+                    "frequency":1
+                },
+            }] 
             # return {'optimizer':optimizer, 'lr_shceduler': {'sceduler':lr_scheduler, 'interval':"step"}}
         else:
             return optimizer 
     
     def training_step(self, batch, batch_idx):
+        #scheduler = self.lr_scheduler()
         images, labels = batch
         outputs = self(images)
         loss = self.get_loss(outputs=outputs, labels=labels)
@@ -73,7 +82,7 @@ class GenericModel(pl.LightningModule):
         self.reset_epoch_metrics(self.epoch_metrics)
     
     def on_validation_epoch_end(self) -> None:
-        for metric in self.epoch_metrics.keys():
-            self.log(f"test/epoch_{metric}", self.epoch_metrics[metric])
-        self.reset_epoch_metrics(self.epoch_metrics)
+        for metric in self.val_epoch_metrics.keys():
+            self.log(f"val/epoch_{metric}", self.val_epoch_metrics[metric])
+        self.reset_epoch_metrics(self.val_epoch_metrics)
         

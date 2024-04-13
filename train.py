@@ -13,26 +13,27 @@ if __name__=="__main__":
 
     configs={
         'ProjectName': 'Involution',
-	    'experiment_name': "New_expmt",
-        'dataset': CIFAR100(root=".", train=True, download=True),
+	    'experiment_name': "imagenet-typr=50-bs=32-Adam-lr=0.8-L2=0.0-full=10-CosineAnnealing",
+        'dataset': GenericClassificationDataset(dataset_path="tiny-imagenet-200"),
         'ReDSnet_type':50,
-        'batch_size': 16,
+        'batch_size': 128,
         'num_classes': 200,
         'optimizer': Adam,
         'optimizer_kwargs': {
-            'lr':1e-5,
+            'lr':0.01,
             'weight_decay':0.0,
         },
-        'num_workers':16,
+        'num_workers':4,
 	    'max_epochs': 10,
         'lr_scheduler': CosineAnnealingLR,
         'lr_scheduler_kwargs':{
-            'T_max':10,
-            'eta_min':1e-6
+            
+            'eta_min':0.0
         },
         'checkpoint_name':'{epoch}-{step}'
     }
     configs['checkpoint_save_path']=f"outputs/{configs['experiment_name']}"
+    configs["lr_scheduler_kwargs"]['T_max'] = configs["max_epochs"]*len(configs['dataset'])/configs["batch_size"]
 
     checkpoint_callback = ModelCheckpoint(dirpath=configs['checkpoint_save_path'], filename=configs['checkpoint_name'],monitor="val/epoch_accuracy", save_last=True, save_on_train_epoch_end=True)
     lr_monitor = LearningRateMonitor(logging_interval='step', log_weight_decay=True)
