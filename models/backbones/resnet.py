@@ -142,6 +142,7 @@ class ResLayer(nn.Sequential):
                     out_channels=out_channels,
                     expansion=self.expansion,
                     stride=1,
+                    has_involution = is_rednet
                     ))
         # self.add_module('layer', nn.Sequential(*layers))
 
@@ -252,11 +253,11 @@ class ReDSNet(nn.Module):
                     nn.init.constant_(m.norm3.weight, 0)
                     nn.init.constant_(m.norm3.bias, 0)
 
-
   def _make_stem_layer(self, in_channels, stem_channels):
     self.stem = nn.Sequential(
             nn.Conv2d(in_channels, stem_channels // 2, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(stem_channels // 2),
+            Involution(stem_channels // 2, 3, 1),
             nn.ReLU(inplace=True),
             nn.Conv2d(stem_channels//2, stem_channels, kernel_size=3, stride=1, padding=1),
         )
