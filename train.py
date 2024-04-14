@@ -20,7 +20,7 @@ if __name__=="__main__":
         'num_classes': 200,
         'optimizer': Adam,
         'optimizer_kwargs': {
-            'lr':0.01,
+            'lr':0.05,
             'weight_decay':0.0,
         },
         'num_workers':4,

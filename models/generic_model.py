@@ -49,7 +49,7 @@ class GenericModel(pl.LightningModule):
         images, labels = batch
         outputs = self(images)
         loss = self.get_loss(outputs=outputs, labels=labels)
-        self.log("train/step_loss", loss.item())
+        self.log("train/step_loss", loss.item(), on_step=True, on_epoch=False)
         self.epoch_loss = self.epoch_loss + (loss.item()-self.epoch_loss)/(batch_idx+1)
         return loss
     
@@ -59,7 +59,7 @@ class GenericModel(pl.LightningModule):
         outputs = self(images)
         metrics = self.get_test_metrics(outputs, labels)
         for metric in metrics.keys():
-            self.log(f"test/{metric}", metrics[metric])
+            self.log(f"test/{metric}", metrics[metric], on_step=True, on_epoch=False)
         self.test_epoch_metrics = self.get_epoch_wise_metric_averages(metrics, self.test_epoch_metrics, batch_idx)
         return metrics
     
@@ -68,7 +68,7 @@ class GenericModel(pl.LightningModule):
         outputs = self(images)
         metrics = self.get_test_metrics(outputs, labels)
         for metric in metrics.keys():
-            self.log(f"val/{metric}", metrics[metric])
+            self.log(f"val/{metric}", metrics[metric], on_step=True, on_epoch=False)
         self.val_epoch_metrics = self.get_epoch_wise_metric_averages(metrics, self.val_epoch_metrics, batch_idx)
         return metrics
 
