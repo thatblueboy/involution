@@ -85,4 +85,6 @@ class GenericModel(pl.LightningModule):
         for metric in self.val_epoch_metrics.keys():
             self.log(f"val/epoch_{metric}", self.val_epoch_metrics[metric])
         self.reset_epoch_metrics(self.val_epoch_metrics)
+    def init_weights(self):
+        self.backbone.init_weights()
         
