@@ -40,6 +40,7 @@ if __name__=="__main__":
     logger = WandbLogger(name=configs['experiment_name'], project=configs['ProjectName'])
     data_module = ClassificationDataModule(configs['dataset'], batch_size=configs['batch_size'], num_workers=configs['num_workers'])
     model = RedNetClassifier(configs['ReDSnet_type'] ,configs['num_classes'], configs['optimizer'], configs['optimizer_kwargs'], configs['lr_scheduler'], configs['lr_scheduler_kwargs'])
+    model.init_weights()
     trainer = pl.Trainer(max_epochs=configs['max_epochs'], check_val_every_n_epoch=2,callbacks=[checkpoint_callback, lr_monitor], logger=logger)
     trainer.fit(model, datamodule=data_module)
     
