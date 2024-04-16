@@ -33,10 +33,10 @@ class GenericClassificationDataset(Dataset):
             ValueError("Must be already implemented in pytorch or a custom dataset path with folder structure as given in this file.")
 
         self.transforms = t.Compose([
-            t.ToTensor(),
-            t.ToDtype(torch.uint8),
+            t.ToImage(),
+            t.ToDtype(torch.uint8, scale=True),
             t.RandomHorizontalFlip(0.5),
-            t.ToDtype(torch.float32),
+            t.ToDtype(torch.float32, scale=True),
             t.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
 
