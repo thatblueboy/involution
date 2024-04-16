@@ -250,8 +250,8 @@ class ReDSNet(nn.Module):
         if self.zero_init_residual:
             for m in self.modules():
                 if isinstance(m, Bottleneck):
-                    nn.init.constant_(m.norm3.weight, 0)
-                    nn.init.constant_(m.norm3.bias, 0)
+                    nn.init.constant_(m.bn3.weight, 0)
+                    nn.init.constant_(m.bn3.bias, 0)
     else:
         super(ReDSNet, self).init_weights(pretrained)
 
