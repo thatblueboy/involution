@@ -237,7 +237,7 @@ class ReDSNet(nn.Module):
               param.requires_grad = False
 
   def init_weights(self, pretrained=None):
-    super(ReDSNet, self).init_weights(pretrained)
+    
 
     if pretrained is None:
         for m in self.modules():
@@ -252,6 +252,8 @@ class ReDSNet(nn.Module):
                 if isinstance(m, Bottleneck):
                     nn.init.constant_(m.norm3.weight, 0)
                     nn.init.constant_(m.norm3.bias, 0)
+    else:
+        super(ReDSNet, self).init_weights(pretrained)
 
   def _make_stem_layer(self, in_channels, stem_channels):
     self.stem = nn.Sequential(
