@@ -8,3 +8,10 @@ lightning_logs/
 tiny-imagenet-200/
 outputs/
 wandb/
+caltech101/
+caltech256/
+food-101.tar.gz
+food-101/
+last.ckpt
+nohup.out
+tiny-imagenet-200.zip

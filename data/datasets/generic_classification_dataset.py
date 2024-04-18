@@ -36,6 +36,10 @@ class GenericClassificationDataset(Dataset):
             t.ToImage(),
             t.ToDtype(torch.uint8, scale=True),
             t.RandomHorizontalFlip(0.5),
+            t.RandomVerticalFlip(0.5),
+            t.RandomRotation(45),
+            t.RandomAffine(45),
+            t.ColorJitter(),
             t.ToDtype(torch.float32, scale=True),
             t.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])

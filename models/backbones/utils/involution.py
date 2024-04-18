@@ -7,7 +7,7 @@ class ConvModule(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1):
         super(ConvModule, self).__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=kernel_size // 2)
-        self.bn = nn.BatchNorm2d(out_channels)
+        self.bn = nn.BatchNorm2d(out_channels, momentum=0.4)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -30,7 +30,7 @@ class Involution(nn.Module):
             in_channels=channels,
             out_channels=channels // reduction_ratio,
             kernel_size=1)
-        self.conv2 = ConvModule(
+        self.conv2 = nn.Conv2d(
             in_channels=channels // reduction_ratio,
             out_channels=kernel_size ** 2 * self.groups,
             kernel_size=1)

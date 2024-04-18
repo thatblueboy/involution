@@ -10,6 +10,7 @@ class GenericModel(pl.LightningModule):
         super(GenericModel, self).__init__()
         self.save_hyperparameters()
         self.epoch_loss = 0
+        self.val_epoch_loss = 0
         self.test_epoch_metrics = {}
         self.val_epoch_metrics = {}
         self.optimizer = optimizer
@@ -36,7 +37,7 @@ class GenericModel(pl.LightningModule):
                 "optimizer": optimizer,
                 "lr_scheduler": {
                     "scheduler": lr_scheduler,
-                    "interval": "step",
+                    "interval": "epoch",
                     "frequency":1
                 },
             }] 
@@ -66,6 +67,9 @@ class GenericModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         images, labels = batch
         outputs = self(images)
+        loss = self.get_loss(outputs=outputs, labels=labels)
+        self.log("val/step_loss", loss.item(), on_step=True, on_epoch=False)
+        self.val_epoch_loss = self.val_epoch_loss + (loss.item()-self.val_epoch_loss)/(batch_idx+1)
         metrics = self.get_test_metrics(outputs, labels)
         for metric in metrics.keys():
             self.log(f"val/{metric}", metrics[metric], on_step=True, on_epoch=False)
@@ -85,6 +89,9 @@ class GenericModel(pl.LightningModule):
         for metric in self.val_epoch_metrics.keys():
             self.log(f"val/epoch_{metric}", self.val_epoch_metrics[metric])
         self.reset_epoch_metrics(self.val_epoch_metrics)
+        self.log("val/epoch_loss", self.val_epoch_loss)
+        self.val_epoch_loss = 0
+
     def init_weights(self):
         self.backbone.init_weights()
         
