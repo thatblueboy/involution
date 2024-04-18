@@ -15,23 +15,23 @@ if __name__=="__main__":
         'ProjectName': 'Involution',
         'dataset_name': 'imagenet_tiny',
         'dataset': GenericClassificationDataset(dataset_path="tiny-imagenet-200"),
-        'ReDSnet_type':50,
-        'batch_size': 128,
+        'ReDSnet_type':26,
+        'batch_size': 96,
         'num_classes': 200,
         'optimizer': SGD,
         'optimizer_kwargs': {
-            'lr':1e-5,
+            'lr':0.01,
             'weight_decay':0.0,
         },
         'num_workers':4,
-        'max_epochs': 10,
-        'lr_scheduler': CosineAnnealingLR,
+        'max_epochs': 25,
+        'lr_scheduler': None,
         'lr_scheduler_kwargs':{
             'eta_min':0.0,
             'T_max': 130
         },
         'checkpoint_name':'{epoch}-{step}',
-        "gradient_clip_val":0.
+        "gradient_clip_val":None
     }
     configs['experiment_name'] = f"{configs['dataset_name']}-type={configs['ReDSnet_type']}-bs={configs['batch_size']}-{configs['optimizer']}-lr={configs['optimizer_kwargs']['lr']}"
     configs['checkpoint_save_path']=f"outputs/{configs['experiment_name']}"
