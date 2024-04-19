@@ -19,6 +19,7 @@ class Bottleneck(nn.Module):
 
   def __init__(self, in_channels, out_channels, expansion = 4, downsample=None, stride=1, has_involution=False):
         super(Bottleneck, self).__init__()
+        self.dropout = nn.Dropout(p=0.1)
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.mid_channels = out_channels // expansion
@@ -48,6 +49,7 @@ class Bottleneck(nn.Module):
             identity = self.downsample(identity)
         x += identity
         x = self.relu(x)
+        x=self.dropout(x)
         return x
 
 
