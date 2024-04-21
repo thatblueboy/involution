@@ -4,14 +4,15 @@ from models.prediction_heads.classifier import Classifier
 from models.generic_model import GenericModel
 import torch.nn as nn
 import torch
-
+from torchvision.models import resnet50
 class ResNetClassifier(GenericModel):
     def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, dropout):
         super(ResNetClassifier, self).__init__(optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs)
-        backbone = ReDSNet(type, is_rednet=False, dropout=dropout)
-        self.add_module("backbone", backbone)
-        self.add_module("adapool", nn.AdaptiveAvgPool2d((1,1)))
-        self.add_module("classifier", Classifier(512*backbone.expansion, num_classes))
+        #backbone = ReDSNet(type, is_rednet=False, dropout=dropout)
+        self.add_module("backbone", resnet50)
+        self.backbone.fc = nn.Linear(in_features=2048, out_features=200, bias=True)
+        #self.add_module("adapool", nn.AdaptiveAvgPool2d((1,1)))
+        #self.add_module("classifier", Classifier(512*backbone.expansion, num_classes))
         self.test_epoch_metrics = {
             "accuracy": 0
         }
@@ -42,9 +43,9 @@ class ResNetClassifier(GenericModel):
         
     def forward(self, images):
         x = self.backbone(images)
-        x = self.adapool(x)
-        x = x.flatten(1)
-        x = self.classifier(x)
+        #x = self.adapool(x)
+        #x = x.flatten(1)
+        #x = self.classifier(x)
         return x
     
     

@@ -34,10 +34,10 @@ class GenericClassificationDataset(Dataset):
             ValueError("Must be already implemented in pytorch or a custom dataset path with folder structure as given in this file.")
 
         self.transforms_train = t.Compose([
-            t.Resize(244, Image.LANCZOS),
+            #t.Resize(244, Image.LANCZOS),
             t.ToImage(),
             t.ToDtype(torch.uint8, scale=True),
-            t.CenterCrop(244),
+            #t.CenterCrop(244),
             t.RandomHorizontalFlip(0.5),
             t.RandomVerticalFlip(0.5),
             t.RandomRotation(45),
@@ -62,7 +62,7 @@ class GenericClassificationDataset(Dataset):
             self.dataset = torch_dataset
         
         if not dataset_path is None:
-            self.dataset = ImageFolder(dataset_path, self.transforms)
+            self.dataset = ImageFolder(dataset_path)
             self.ds_type=1
 
     def __len__(self):
