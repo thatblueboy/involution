@@ -7,6 +7,7 @@ from torchvision.datasets import ImageNet, CIFAR100, CIFAR100, MNIST, Caltech256
 from models.rednet_classifier import RedNetClassifier
 from models.resnet_classifier import ResNetClassifier
 from models.dednet_classifier import DedNetClassifier
+from models.densenet_classifier import DenseNetClassifier
 from data.datasets.generic_classification_dataset import GenericClassificationDataset
 from torch.optim import Adam, SGD
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, StepLR, PolynomialLR
@@ -15,28 +16,28 @@ if __name__=="__main__":
 
     configs={
         'ProjectName': 'Involution',
-        'model': RedNetClassifier,
+        'model': DedNetClassifier,
         'dataset_name': 'Caltech256',
         'dataset': GenericClassificationDataset(torch_dataset=Caltech256(root=".")),
-        'ReDSnet_type': 50,
-        'batch_size': 96,
+        'ReDSnet_type': 121,
+        'batch_size': 32,
         'num_classes': 257,
         'optimizer': SGD,
         'optimizer_kwargs': {
-            'lr':0.8,
+            'lr':5e-3,
             'weight_decay':1e-4,
             "momentum": 0.9,
             'nesterov': True
         },
         'num_workers':40,
-        'max_epochs': 300,
+        'max_epochs': 130,
         'lr_scheduler': CosineAnnealingLR,
         'lr_scheduler_kwargs':{
-            'eta_min': 1e-5,
-            'T_max': 300
+            'eta_min': 1e-6,
+            'T_max': 130
         },
         'checkpoint_name':'{epoch}-{step}',
-        "gradient_clip_val":1.,
+        "gradient_clip_val":0.25,
         'dropout': 0.1
     }
     configs['experiment_name'] = f"model={configs['model']}-{configs['dataset_name']}-type={configs['ReDSnet_type']}-bs={configs['batch_size']}-{configs['optimizer']}-optkwargs={configs['optimizer_kwargs']}-dropout={configs['dropout']*100}-new_transforms-clip_val={configs['gradient_clip_val']}"
@@ -48,7 +49,7 @@ if __name__=="__main__":
     logger = WandbLogger(name=configs['experiment_name'], project=configs['ProjectName'])
     data_module = ClassificationDataModule(configs['dataset'], batch_size=configs['batch_size'], num_workers=configs['num_workers'])
     model = configs['model'](configs['ReDSnet_type'] ,configs['num_classes'], configs['optimizer'], configs['optimizer_kwargs'], configs['lr_scheduler'], configs['lr_scheduler_kwargs'], dropout = configs['dropout'])#.load_from_checkpoint("last.ckpt", optimizer = configs['optimizer'], optimizer_kwargs = configs['optimizer_kwargs'],lr_scheduler =  configs['lr_scheduler'],lr_scheduler_kwargs =  configs['lr_scheduler_kwargs'])
-    #model.init_weights()
+    model.init_weights()
     trainer = pl.Trainer(max_epochs=configs['max_epochs'], check_val_every_n_epoch=2,callbacks=[checkpoint_callback, lr_monitor], logger=logger, gradient_clip_val = configs['gradient_clip_val'] )
     trainer.fit(model, datamodule=data_module)
     #print(model)

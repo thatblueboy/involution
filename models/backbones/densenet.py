@@ -64,7 +64,10 @@ class _DenseLayer(nn.Module):
 
         bottleneck_output = self.bn_function(prev_features)
         if self.has_involution:
-            new_features = self.conv2(self.relu2(self.norm2(self.involve_relu(self.involution(bottleneck_output)))))
+            print(f"pre_inv: {bottleneck_output.mean()}")
+            bottleneck_output = self.involution(self.involve_relu(self.involve_norm(bottleneck_output)))
+            print(f"post_inv: {bottleneck_output.mean()}")
+            new_features = self.conv2(self.relu2(self.norm2(bottleneck_output)))
         else:
             new_features = self.conv2(self.relu2(self.norm2(bottleneck_output)))
         if self.drop_rate > 0:

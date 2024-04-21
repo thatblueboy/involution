@@ -24,7 +24,7 @@ class Involution(nn.Module):
         self.stride = stride
         self.channels = channels
         reduction_ratio = 4
-        self.group_channels = 16
+        self.group_channels = 1
         self.groups = self.channels // self.group_channels
         self.conv1 = ConvModule(
             in_channels=channels,
@@ -42,6 +42,9 @@ class Involution(nn.Module):
         weight = self.conv2(self.conv1(x if self.stride == 1 else self.avgpool(x)))
         b, c, h, w = weight.shape
         weight = weight.view(b, self.groups, self.kernel_size ** 2, h, w).unsqueeze(2)
+        print(f"inv_weight: {weight[0,0,0,:,0,0]}")
         out = self.unfold(x).view(b, self.groups, self.group_channels, self.kernel_size ** 2, h, w)
+        print(f"inv_input: {out[0,0,0,:,0,0]}")
         out = (weight * out).sum(dim=3).view(b, self.channels, h, w)
+        print(f"inv_output: {out[0,0,0,0]}")
         return out
