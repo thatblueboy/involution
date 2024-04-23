@@ -16,16 +16,16 @@ if __name__=="__main__":
 
     configs={
         'ProjectName': 'Involution',
-        'model': DedNetClassifier,
+        'model': ResNetClassifier,
         'dataset_name': 'Caltech256',
         'dataset': GenericClassificationDataset(torch_dataset=Caltech256(root=".")),
-        'ReDSnet_type': 121,
-        'batch_size': 32,
+        'ReDSnet_type': 26,
+        'batch_size': 16,
         'num_classes': 257,
         'optimizer': SGD,
         'optimizer_kwargs': {
-            'lr':5e-3,
-            'weight_decay':1e-4,
+            'lr':0.1,
+            'weight_decay':0.0,
             "momentum": 0.9,
             'nesterov': True
         },
@@ -37,19 +37,19 @@ if __name__=="__main__":
             'T_max': 130
         },
         'checkpoint_name':'{epoch}-{step}',
-        "gradient_clip_val":0.25,
+        "gradient_clip_val":None,
         'dropout': 0.1
     }
-    configs['experiment_name'] = f"model={configs['model']}-{configs['dataset_name']}-type={configs['ReDSnet_type']}-bs={configs['batch_size']}-{configs['optimizer']}-optkwargs={configs['optimizer_kwargs']}-dropout={configs['dropout']*100}-new_transforms-clip_val={configs['gradient_clip_val']}"
+    configs['experiment_name'] = f"model={configs['model']}-{configs['dataset_name']}-type={configs['ReDSnet_type']}-bs={configs['batch_size']}-{configs['optimizer']}-optkwargs={configs['optimizer_kwargs']}-dropout={configs['dropout']*100}-new_transforms-clip_val={configs['gradient_clip_val']}-sdm"
     configs['checkpoint_save_path']=f"outputs/{configs['experiment_name']}"
     #configs["lr_scheduler_kwargs"]['T_max'] = configs["max_epochs"]*len(configs['dataset'])/configs["batch_size"]
 
     checkpoint_callback = ModelCheckpoint(dirpath=configs['checkpoint_save_path'], filename=configs['checkpoint_name'],monitor="val/epoch_accuracy", save_last=True, save_on_train_epoch_end=True)
     lr_monitor = LearningRateMonitor(logging_interval='step', log_weight_decay=True)
     logger = WandbLogger(name=configs['experiment_name'], project=configs['ProjectName'])
-    data_module = ClassificationDataModule(configs['dataset'], batch_size=configs['batch_size'], num_workers=configs['num_workers'])
+    data_module = torch.load("data_module.pth") #ClassificationDataModule(configs['dataset'], batch_size=configs['batch_size'], num_workers=configs['num_workers'])
     model = configs['model'](configs['ReDSnet_type'] ,configs['num_classes'], configs['optimizer'], configs['optimizer_kwargs'], configs['lr_scheduler'], configs['lr_scheduler_kwargs'], dropout = configs['dropout'])#.load_from_checkpoint("last.ckpt", optimizer = configs['optimizer'], optimizer_kwargs = configs['optimizer_kwargs'],lr_scheduler =  configs['lr_scheduler'],lr_scheduler_kwargs =  configs['lr_scheduler_kwargs'])
     model.init_weights()
     trainer = pl.Trainer(max_epochs=configs['max_epochs'], check_val_every_n_epoch=2,callbacks=[checkpoint_callback, lr_monitor], logger=logger, gradient_clip_val = configs['gradient_clip_val'] )
-    trainer.fit(model, datamodule=data_module)
-    #print(model)
+    trainer.fit(model, datamodule=data_module)#, ckpt_path="last.ckpt")
+    #torch.save(data_module,"data_module.pth")

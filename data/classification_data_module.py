@@ -6,14 +6,12 @@ from torch.utils.data import random_split, DataLoader
 class ClassificationDataModule(pl.LightningDataModule):
     def __init__(self, dataset, batch_size, num_workers):
         super(ClassificationDataModule, self).__init__()
-        self.dataset = GenericClassificationDataset(torch_dataset=dataset)
+        self.dataset = dataset
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.train, self.val = random_split(self.dataset, (0.8,0.2))
     def setup(self, stage: str) -> None:
-        if stage=='fit':
-            self.train, self.val = random_split(self.dataset, (0.8,0.2))
-            self.train.split = "train"
-            self.val.split = "val"
+        pass
     
     def train_dataloader(self):
         return DataLoader(self.train, self.batch_size, shuffle=True, num_workers=self.num_workers, pin_memory=True,drop_last=True)
