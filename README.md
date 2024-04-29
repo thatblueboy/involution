@@ -21,4 +21,22 @@ rednet50 = RedNet(50) # 50 layer Rednet model
 
 ```notebooks``` contains main python notebooks for training and testing.
 
+### Training
+
+```
+git clone https://github.com/d-li14/involution.git #clone the repo
+git checkout submission_branch #change to the submission branch
+```
+Edit the ```train.py``` file. Here you can change various Hyperparameters in the config dict. Note that changing lr_scheduler will require corresponding chnage in lr_sceduler_kwargs.
+Note: We use a random split split on Caltech256. For uniformity we store this split in the data_module.pth and load it for every training run.
+This behaviour could be changed by setting the 'data_module_path' value in the config dict = None.
+
+To switch from training to testing mode, change the last line in the train.py from
+```
+trainer.fit(model, data_module)
+```
+to
+```
+trainer.test(test, data_module)
+```
 ### To Do

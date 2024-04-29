@@ -33,12 +33,13 @@ class GenericModel(pl.LightningModule):
         optimizer = self.optimizer(self.parameters(), **self.optimizer_kwargs)
         if not self.lr_scheduler is None:
             lr_scheduler = self.lr_scheduler(optimizer, **self.lr_scheduler_kwargs)
+            print("\n\n\n\n\n\nconfigured optimizer and lr_scheduler\n\n\n\n\n\n\n\n")
             return [{
                 "optimizer": optimizer,
                 "lr_scheduler": {
                     "scheduler": lr_scheduler,
                     "interval": "epoch",
-                    "frequency":1
+                    "frequency":50
                 },
             }] 
             # return {'optimizer':optimizer, 'lr_shceduler': {'sceduler':lr_scheduler, 'interval':"step"}}
@@ -81,9 +82,9 @@ class GenericModel(pl.LightningModule):
         self.epoch_loss = 0
 
     def on_test_epoch_end(self):
-        for metric in self.epoch_metrics.keys():
-            self.log(f"test/epoch_{metric}", self.epoch_metrics[metric])
-        self.reset_epoch_metrics(self.epoch_metrics)
+        for metric in self.test_epoch_metrics.keys():
+            self.log(f"test/epoch_{metric}", self.test_epoch_metrics[metric])
+        self.reset_epoch_metrics(self.test_epoch_metrics)
     
     def on_validation_epoch_end(self) -> None:
         for metric in self.val_epoch_metrics.keys():
@@ -94,4 +95,11 @@ class GenericModel(pl.LightningModule):
 
     def init_weights(self):
         self.backbone.init_weights()
-        
+    
+    def on_train_epoch_start(self):
+        if self.current_epoch % 150 == 0 :
+
+            for g in self.optimizers().param_groups:
+
+                g['lr']*=0.1
+

@@ -20,4 +20,4 @@ class ClassificationDataModule(pl.LightningDataModule):
         return DataLoader(self.val, self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=True)
     
     def test_dataloader(self):
-        return DataLoader(self.dataset, self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=True)
+        return DataLoader(self.val, self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=True)
