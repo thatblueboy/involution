@@ -44,4 +44,8 @@ to
 ```
 trainer.test(test, data_module)
 ```
+after making all the necessary changes do:
+```
+python train.py
+```
 ### To Do
