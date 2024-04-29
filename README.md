@@ -7,7 +7,12 @@ This repository contains re-Implementation of https://arxiv.org/abs/2103.06255
 
 
 The authors of _Involution: Inverting the Inherence of Convolution for Visual Recognition_ propose a novel involutional layers, which aims to enhance the representation power of convolutional neural networks by inverting the inherent properties of convolution operations. As such these kernals are channel agnostic and spatial specific.
-
+### Setup
+```
+pip install torch torchvision
+pip install wandb
+pip install lightning
+```
 ### Usage
 
 ```python
