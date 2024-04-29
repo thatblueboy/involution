@@ -60,5 +60,5 @@ if __name__=="__main__":
         model = configs['model'].load_from_checkpoint("last.ckpt", optimizer = configs['optimizer'], optimizer_kwargs = configs['optimizer_kwargs'],lr_scheduler =  configs['lr_scheduler'],lr_scheduler_kwargs =  configs['lr_scheduler_kwargs'])
 
     trainer = pl.Trainer(max_epochs=configs['max_epochs'], check_val_every_n_epoch=2,callbacks=[checkpoint_callback, lr_monitor], logger=logger, gradient_clip_val = configs['gradient_clip_val'] )
-    trainer.test(model, datamodule=data_module)#, ckpt_path="last.ckpt")
+    trainer.fit(model, datamodule=data_module)#, ckpt_path="last.ckpt")
     #torch.save(data_module,"data_module.pth")

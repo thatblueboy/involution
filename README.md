@@ -46,6 +46,7 @@ trainer.test(test, data_module)
 ```
 after making all the necessary changes do:
 ```
+wandb login
 python train.py
 ```
 ### To Do
