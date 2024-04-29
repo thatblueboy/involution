@@ -39,7 +39,7 @@ if __name__=="__main__":
         'checkpoint_name':'{epoch}-{step}',
         "gradient_clip_val":1,
         'dropout': 0,
-        'pretrained': 'last.ckpt'
+        'pretrained': None
     }
     configs['experiment_name'] = f"model={configs['model']}-{configs['dataset_name']}-type={configs['ReDSnet_type']}-bs={configs['batch_size']}-{configs['optimizer']}-optkwargs={configs['optimizer_kwargs']}-dropout={configs['dropout']*100}-new_transforms-clip_val={configs['gradient_clip_val']}-sdm"
     configs['checkpoint_save_path']=f"outputs/{configs['experiment_name']}"

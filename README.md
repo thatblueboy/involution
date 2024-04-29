@@ -35,7 +35,7 @@ trainer.fit(model, data_module)
 ```
 to
 ```
-trainer.test(test, data_module)
+trainer.test(model, data_module)
 ```
 - After making all the necessary changes do:
 ```
