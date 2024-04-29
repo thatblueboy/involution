@@ -29,7 +29,7 @@ rednet50 = RedNet(50) # 50 layer Rednet model
 ### Training
 
 ```
-git clone https://github.com/d-li14/involution.git #clone the repo
+git clone https://github.com/thatblueboy/involution.git #clone the repo
 git checkout submission_branch #change to the submission branch
 ```
 Edit the ```train.py``` file. Here you can change various Hyperparameters in the config dict. Note that changing lr_scheduler will require corresponding chnage in lr_sceduler_kwargs.
