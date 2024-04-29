@@ -13,18 +13,6 @@ pip install torch torchvision
 pip install wandb
 pip install lightning
 ```
-### Usage
-
-```python
-from models.rednet import RedNet
-
-rednet50 = RedNet(50) # 50 layer Rednet model
-```
-### Folders
-
-```models``` contains implementation of backbone models introduced the paper and related heads and neck architectures.
-
-```notebooks``` contains main python notebooks for training and testing.
 
 ### Training
 
