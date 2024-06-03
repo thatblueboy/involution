@@ -3,6 +3,7 @@ from torchvision.datasets import ImageFolder
 import torchvision.transforms.v2 as t
 import torch
 import numpy as np
+from PIL import Image, ImageEnhance
 '''
 This code assumes the following folder structure
 |- Main Dataset Folder
@@ -28,21 +29,32 @@ This code assumes the following folder structure
 '''
 
 class GenericClassificationDataset(Dataset):
-    def __init__(self, dataset_path = None, torch_dataset = None):
+    def __init__(self, dataset_path = None, torch_dataset = None, split = "train"):
         if dataset_path is None and torch_dataset is None:
             ValueError("Must be already implemented in pytorch or a custom dataset path with folder structure as given in this file.")
 
-        self.transforms = t.Compose([
+        self.transforms_train = t.Compose([
+            t.Resize(244, Image.LANCZOS),
             t.ToImage(),
             t.ToDtype(torch.uint8, scale=True),
+            t.CenterCrop(244),
             t.RandomHorizontalFlip(0.5),
             t.RandomVerticalFlip(0.5),
             t.RandomRotation(45),
             t.RandomAffine(45),
-            t.ColorJitter(),
+            #t.ColorJitter(),
             t.ToDtype(torch.float32, scale=True),
             t.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
+
+        self.transforms_val = t.Compose([
+             t.ToImage(),
+             t.ToDtype(torch.uint8, scale=True),
+             t.CenterCrop(244),
+             t.ToDtype(torch.float32, scale=True),
+             t.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ])
+        self.split = split
 
         self.ds_type=0
 
@@ -57,6 +69,6 @@ class GenericClassificationDataset(Dataset):
         return len(self.dataset)
     
     def __getitem__(self, index):
-        return self.transforms(self.dataset[index])
+        return self.transforms_train(self.dataset[index]) if self.split == "train" else self.transforms_val(self.dataset[index])
         
 

@@ -5,22 +5,10 @@ from models.generic_model import GenericModel
 import torch.nn as nn
 import torch
 
-class RedNetClassifier(GenericModel):
-<<<<<<< HEAD
-    def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, is_rednet = False):
-||||||| a3ba3f4
-    def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs):
-=======
+class ResNetClassifier(GenericModel):
     def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, dropout):
->>>>>>> submission_branch
-        super(RedNetClassifier, self).__init__(optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs)
-<<<<<<< HEAD
-        backbone = ReDSNet(type, is_rednet=is_rednet)
-||||||| a3ba3f4
-        backbone = ReDSNet(type, is_rednet=True)
-=======
-        backbone = ReDSNet(type, is_rednet=True, dropout=dropout)
->>>>>>> submission_branch
+        super(ResNetClassifier, self).__init__(optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs)
+        backbone = ReDSNet(type, is_rednet=False, dropout=dropout)
         self.add_module("backbone", backbone)
         self.add_module("adapool", nn.AdaptiveAvgPool2d((1,1)))
         self.add_module("classifier", Classifier(512*backbone.expansion, num_classes))
@@ -35,28 +23,13 @@ class RedNetClassifier(GenericModel):
     def get_loss(self, outputs, labels):
         return self.loss_fn(outputs, labels)
 
-    def accuracy(self, true, pred, top_k=(1,)):
-
-        max_k = max(top_k)
-        batch_size = true.size(0)
-
-        _, pred = pred.topk(max_k, 1)
-        pred = pred.t()
-        correct = pred.eq(true.view(1, -1).expand_as(pred))
-
-        result = []
-        for k in top_k:
-            correct_k = correct[:k].view(-1).float().sum(0)
-            result.append(correct_k.div_(batch_size))
-
-        return result[0]
-
+        
     def get_test_metrics(self, outputs: torch.Tensor, labels: torch.Tensor):
         batch_size = outputs.shape[0]
         metrics = {}
         _, preds = outputs.max(1)
         true_positives = (preds==labels).sum()
-        metrics["accuracy"] = self.accuracy(labels, outputs)#true_positives/batch_size
+        metrics["accuracy"] = true_positives/batch_size
         return metrics
         
     def get_epoch_wise_metric_averages(self, metrics, epoch_metrics, batch_idx):

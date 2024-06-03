@@ -1,29 +1,46 @@
 from typing import Any
-from models.backbones.resnet import ReDSNet
+from models.backbones.densenet import DenseNet
 from models.prediction_heads.classifier import Classifier
 from models.generic_model import GenericModel
 import torch.nn as nn
 import torch
 
-class RedNetClassifier(GenericModel):
-<<<<<<< HEAD
-    def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, is_rednet = False):
-||||||| a3ba3f4
-    def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs):
-=======
-    def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, dropout):
->>>>>>> submission_branch
-        super(RedNetClassifier, self).__init__(optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs)
-<<<<<<< HEAD
-        backbone = ReDSNet(type, is_rednet=is_rednet)
-||||||| a3ba3f4
-        backbone = ReDSNet(type, is_rednet=True)
-=======
-        backbone = ReDSNet(type, is_rednet=True, dropout=dropout)
->>>>>>> submission_branch
-        self.add_module("backbone", backbone)
-        self.add_module("adapool", nn.AdaptiveAvgPool2d((1,1)))
-        self.add_module("classifier", Classifier(512*backbone.expansion, num_classes))
+class DedNetClassifier(GenericModel):
+    def __init__(self, dednet_type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, dropout):
+        super(DedNetClassifier, self).__init__(optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs)
+        types = {
+                121: {
+                        'growth_rate': 32,
+                        'block_config': (6, 12, 24, 16),
+                        'num_init_features': 64,
+                },
+                161: {
+                        'growth_rate': 48,
+                        'block_config': (6, 12, 36, 24),
+                        'num_init_features': 96,
+                },
+                169: {
+                        'growth_rate': 32,
+                        'block_config': (6, 12, 32, 32),
+                        'num_init_features': 64,
+                },
+                201: {
+                        'growth_rate': 32,
+                        'block_config': (6, 12, 48, 32),
+                        'num_init_features': 64,
+                    }
+                }
+
+        dednet_conf = types[dednet_type]
+        self.backbone = DenseNet(
+                dednet_conf['growth_rate'],
+                dednet_conf['block_config'],
+                dednet_conf['num_init_features'],
+                drop_rate = dropout,
+                num_classes = num_classes,
+                is_dednet=True)
+
+
         self.test_epoch_metrics = {
             "accuracy": 0
         }
@@ -69,9 +86,4 @@ class RedNetClassifier(GenericModel):
         
     def forward(self, images):
         x = self.backbone(images)
-        x = self.adapool(x)
-        x = x.flatten(1)
-        x = self.classifier(x)
         return x
-    
-    

@@ -17,9 +17,14 @@ class Bottleneck(nn.Module):
             Default: dict(type='BN')
     """
 
-  def __init__(self, in_channels, out_channels, expansion = 4, downsample=None, stride=1, has_involution=False):
+  def __init__(self, in_channels, out_channels, expansion = 4, downsample=None, stride=1, has_involution=False, dropout=0.1):
         super(Bottleneck, self).__init__()
+<<<<<<< HEAD
         self.dropout = nn.Dropout(p=0.1)
+||||||| a3ba3f4
+=======
+        self.dropout = nn.Dropout(dropout)
+>>>>>>> submission_branch
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.mid_channels = out_channels // expansion
@@ -49,7 +54,12 @@ class Bottleneck(nn.Module):
             identity = self.downsample(identity)
         x += identity
         x = self.relu(x)
+<<<<<<< HEAD
         x=self.dropout(x)
+||||||| a3ba3f4
+=======
+        x = self.dropout(x)
+>>>>>>> submission_branch
         return x
 
 
@@ -112,6 +122,7 @@ class ResLayer(nn.Sequential):
                  stride=1,
                  avg_down = False,
                  is_rednet = False,
+                 dropout=0.1,
                  **kwargs):
         self.block = block
         self.expansion = get_expansion(block, expansion)
@@ -132,10 +143,9 @@ class ResLayer(nn.Sequential):
                 nn.BatchNorm2d(out_channels)
             ])
             downsample = nn.Sequential(*downsample)
-
         layers = []
         layers.append(
-            block( in_channels=in_channels, out_channels=out_channels,expansion=self.expansion, stride=stride, downsample=downsample, has_involution = is_rednet))
+            block( in_channels=in_channels, out_channels=out_channels,expansion=self.expansion, stride=stride, downsample=downsample, has_involution = is_rednet, dropout = dropout))
         in_channels = out_channels
         for _ in range(1, num_blocks):
             layers.append(
@@ -144,7 +154,8 @@ class ResLayer(nn.Sequential):
                     out_channels=out_channels,
                     expansion=self.expansion,
                     stride=1,
-                    has_involution = is_rednet
+                    has_involution = is_rednet,
+                    dropout = dropout
                     ))
         # self.add_module('layer', nn.Sequential(*layers))
 
@@ -173,6 +184,7 @@ class ReDSNet(nn.Module):
               avg_down=False,
               zero_init_residual=True,
               is_rednet = False,
+              dropout = 0.1
               ):
     super(ReDSNet, self).__init__()
     if depth not in self.arch_settings:
@@ -182,7 +194,6 @@ class ReDSNet(nn.Module):
     self.stem_channels = stem_channels
     self.base_channels = base_channels
     self.frozen_stages = frozen_stages
-
     self.num_stages = num_stages
     assert num_stages >= 1 and num_stages <= 4
     self.strides = strides
@@ -210,7 +221,8 @@ class ReDSNet(nn.Module):
                 expansion=self.expansion,
                 stride=stride,
                 avg_down=self.avg_down,
-                is_rednet = is_rednet
+                is_rednet = is_rednet,
+                dropout = dropout
                 )
             _in_channels = _out_channels
             _out_channels *= 2
