@@ -6,21 +6,9 @@ import torch.nn as nn
 import torch
 
 class RedNetClassifier(GenericModel):
-<<<<<<< HEAD
-    def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, is_rednet = False):
-||||||| a3ba3f4
-    def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs):
-=======
     def __init__(self, type, num_classes, optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs, dropout):
->>>>>>> submission_branch
         super(RedNetClassifier, self).__init__(optimizer, optimizer_kwargs, lr_scheduler, lr_scheduler_kwargs)
-<<<<<<< HEAD
-        backbone = ReDSNet(type, is_rednet=is_rednet)
-||||||| a3ba3f4
-        backbone = ReDSNet(type, is_rednet=True)
-=======
         backbone = ReDSNet(type, is_rednet=True, dropout=dropout)
->>>>>>> submission_branch
         self.add_module("backbone", backbone)
         self.add_module("adapool", nn.AdaptiveAvgPool2d((1,1)))
         self.add_module("classifier", Classifier(512*backbone.expansion, num_classes))
